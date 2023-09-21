@@ -31,8 +31,6 @@ namespace EBAD_Backend.Services.Concrete
                 r.ReviewerName == request.ReviewerName &&
                 r.ReviewerEmailAddress == request.ReviewerEmailAddress).Any();
 
-            // check fake review here
-
             if (existsInDb)
             {
                 throw new ApiException("Review already exists")
@@ -40,6 +38,22 @@ namespace EBAD_Backend.Services.Concrete
                     StatusCode = (int)HttpStatusCode.BadRequest
                 };
             }
+
+            #region Fake Review Check
+
+            // check fake review here
+            //var fake = true;
+
+            //if (fake)
+            //{
+            //    return new BaseResponse<bool>()
+            //    {
+            //        Message = "Review is fake or computer gernerated",
+            //        Success = false,
+            //    };
+            //}
+
+            #endregion
 
             var review = new Review
             {
