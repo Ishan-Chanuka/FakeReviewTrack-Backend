@@ -60,6 +60,16 @@ namespace EBAD_Backend.Services.Concrete
 
         public async Task<BaseResponse<IList<Review>>> InsertReview(ReviewRequest request)
         {
+            if (request is null)
+            {
+                return new BaseResponse<IList<Review>>()
+                {
+                    Message = "Request is null",
+                    Success = false,
+                    Data = new List<Review>()
+                };
+            }
+
             using var client = new HttpClient();
             try
             {
