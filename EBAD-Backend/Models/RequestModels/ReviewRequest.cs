@@ -1,14 +1,28 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace EBAD_Backend.Models.RequestModels
 {
     public class ReviewRequest
     {
-        public string ProductId { get; set; } = string.Empty;
-        public string OrderId { get; set; } = string.Empty;
-        public string ProductCategory { get; set; } = string.Empty;
-        public string ReviewerName { get; set; } = string.Empty;
-        public string ReviewerEmailAddress { get; set; } = string.Empty;
-        public string ReviewContent { get; set; } = string.Empty;
+        [Required]
+        public string ProductId { get; set; }
+
+        [Required]
+        public string OrderId { get; set; }
+
+        [Required]
+        public string ProductCategory { get; set; }
+
+        [Required]
+        public string ReviewerName { get; set; }
+
+        [Required]
+        public string ReviewerEmailAddress { get; set; }
+
+        [Required]
+        public string ReviewContent { get; set; }
+
+        [Required]
         public string ProductImage { get; set; }
     }
 }

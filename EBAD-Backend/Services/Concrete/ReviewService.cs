@@ -60,7 +60,7 @@ namespace EBAD_Backend.Services.Concrete
 
         public async Task<BaseResponse<IList<Review>>> InsertReview(ReviewRequest request)
         {
-            if (request is null)
+            if (request is null || string.IsNullOrEmpty(request.ReviewContent) || string.IsNullOrWhiteSpace(request.ReviewContent))
             {
                 throw new ApiException("Request cannot be null")
                 {
