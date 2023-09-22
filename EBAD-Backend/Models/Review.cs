@@ -28,7 +28,7 @@ namespace EBAD_Backend.Models
         public string ReviewContent { get; set; }
 
         [BsonElement("image")]
-        public byte[] ProductImage { get; set; }
+        public string ProductImage { get; set; }
 
         [BsonElement("date")]
         public DateTime ReviewDate { get; set; } = DateTime.Now;

@@ -21,22 +21,30 @@ namespace EBAD_Backend.Services.Concrete
         private readonly IDataAccess _dataAccess;
         private readonly MongoSettings _settings;
         private readonly IMongoCollection<Review> _review;
+        private readonly IMongoCollection<Purchase> _purchase;
 
         public ReviewService(IDataAccess data, IOptions<MongoSettings> options)
         {
             _dataAccess = data;
             _settings = options.Value;
             _review = _dataAccess.ConnectToMongo<Review>(_settings.ReviewsCollection);
+            _purchase = _dataAccess.ConnectToMongo<Purchase>(_settings.PurchasesCollection);
         }
 
-        public async Task<BaseResponse<bool>> UserVerification(string productId, string name, string email)
+        public async Task<BaseResponse<bool>> UserVerification(string productId, string name, string email, string orderId)
         {
-            var existsInDb = await _review.Find(r =>
-                r.ProductId == productId &&
-                r.ReviewerName == name &&
-                r.ReviewerEmailAddress == email).AnyAsync();
+            var exist = await _purchase.Find(p => 
+                p.OrderId == orderId && 
+                p.ProductId == productId &&
+                p.CustomerName == name && 
+                p.CustomerEmailAddress == email).AnyAsync();
 
-            if (existsInDb)
+            //var existsInDb = await _review.Find(r =>
+            //    r.ProductId == productId &&
+            //    r.ReviewerName == name &&
+            //    r.ReviewerEmailAddress == email).AnyAsync();
+
+            if (exist)
             {
                 return new BaseResponse<bool>()
                 {
@@ -59,7 +67,6 @@ namespace EBAD_Backend.Services.Concrete
             {
                 var apirequest = new HttpRequestMessage(HttpMethod.Post, "https://fake-review-ml.azurewebsites.net/predict");
 
-
                 var requestBody = new
                 {
                     review = request.ReviewContent
@@ -72,7 +79,9 @@ namespace EBAD_Backend.Services.Concrete
                 apirequest.Content = content;
 
                 HttpResponseMessage response = await client.SendAsync(apirequest);
-                var isReviewd = await UserVerification(request.ProductId, request.ReviewerName, request.ReviewerEmailAddress);
+
+
+                var isReviewd = await UserVerification(request.ProductId, request.ReviewerName, request.ReviewerEmailAddress, request.OrderId);
 
                 if (response.IsSuccessStatusCode)
                 {

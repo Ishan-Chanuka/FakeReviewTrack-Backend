@@ -9,6 +9,6 @@ namespace EBAD_Backend.Models.RequestModels
         public string ReviewerName { get; set; } = string.Empty;
         public string ReviewerEmailAddress { get; set; } = string.Empty;
         public string ReviewContent { get; set; } = string.Empty;
-        public byte[] ProductImage { get; set; }
+        public string ProductImage { get; set; }
     }
 }
