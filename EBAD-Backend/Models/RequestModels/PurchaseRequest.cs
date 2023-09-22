@@ -2,11 +2,11 @@
 {
     public class PurchaseRequest
     {
-        public string OrderId { get; set; }
-        public string ProductId { get; set; }
-        public string CustomerName { get; set; }
-        public string CustomerEmailAddress { get; set; }
-        public string CustomerPhoneNumber { get; set; }
-        public string ProductImage { get; set; }
+        public string OrderId { get; set; } = string.Empty;
+        public string ProductId { get; set; } = string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
+        public string CustomerEmailAddress { get; set; } = string.Empty;
+        public string CustomerPhoneNumber { get; set; } = string.Empty;
+        public string ProductImage { get; set; } = string.Empty;
     }
 }

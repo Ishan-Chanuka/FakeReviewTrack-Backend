@@ -4,10 +4,10 @@ using MongoDB.Driver;
 
 namespace EBAD_Backend.DataAccess.Concrete
 {
-    public class DataAccess : IDataAccess
+    public class DataAccessService : IDataAccess
     {
         private readonly MongoSettings _settings;
-        public DataAccess(IOptions<MongoSettings> options)
+        public DataAccessService(IOptions<MongoSettings> options)
         {
             _settings = options.Value;
         }
