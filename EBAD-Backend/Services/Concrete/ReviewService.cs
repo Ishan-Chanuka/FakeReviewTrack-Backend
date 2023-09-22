@@ -62,11 +62,9 @@ namespace EBAD_Backend.Services.Concrete
         {
             if (request is null)
             {
-                return new BaseResponse<IList<Review>>()
+                throw new ApiException("Request cannot be null")
                 {
-                    Message = "Request is null",
-                    Success = false,
-                    Data = new List<Review>()
+                    StatusCode = (int)HttpStatusCode.BadRequest
                 };
             }
 
