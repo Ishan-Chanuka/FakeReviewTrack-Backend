@@ -1,4 +1,6 @@
+using EBAD_Backend.DataAccess;
 using EBAD_Backend.Extension;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.DatabaseExtention(builder.Configuration);
+builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoConnection"));
 
 builder.Services.AddServices();
 
