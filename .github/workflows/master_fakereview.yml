@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'FakeReview'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_815FD3D46FE444BFAD9D8ECC7B76AB3C }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F1497FC26A094959BA92B1AE22CD5199 }}
           package: .
