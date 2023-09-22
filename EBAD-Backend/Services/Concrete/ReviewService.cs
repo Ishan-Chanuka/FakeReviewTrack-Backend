@@ -41,14 +41,14 @@ namespace EBAD_Backend.Services.Concrete
                 return new BaseResponse<bool>()
                 {
                     Message = "User already reviewed this product",
-                    Success = false,
+                    Success = true,
                 };
             }
 
             return new BaseResponse<bool>()
             {
                 Message = "User can review this product",
-                Success = true,
+                Success = false,
             };
         }
 
@@ -91,7 +91,7 @@ namespace EBAD_Backend.Services.Concrete
                             };
                         }
 
-                        else if (prediction == "OR" && isReviewd.Success == true)
+                        else if (prediction == "OR" && isReviewd.Success == false)
                         {
                             var review = new Review
                             {
@@ -118,7 +118,7 @@ namespace EBAD_Backend.Services.Concrete
                         return new BaseResponse<IList<Review>>()
                         {
                             Message = "Unabled to added review due to " + ((prediction == "CG") ? 
-                                      "review is fake" : (isReviewd.Success == false) ? 
+                                      "review is fake" : (isReviewd.Success == true) ? 
                                       "user is already reviewd this product" : "something went wrong"),
                             Success = false,
                             Data = new List<Review>()
