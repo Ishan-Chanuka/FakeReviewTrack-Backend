@@ -6,7 +6,8 @@ namespace EBAD_Backend.Services.Interface
 {
     public interface IReviewService
     {
-        Task<BaseResponse<bool>> InsertReview(ReviewRequest request);
+        Task<BaseResponse<IList<Review>>> InsertReview(ReviewRequest request);
         Task<BaseResponse<IList<Review>>> GetAllReviewByProductId(string productId);
+        Task<BaseResponse<bool>> UserVerification(string productId, string name, string email);
     }
 }

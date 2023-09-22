@@ -8,6 +8,11 @@ using EBAD_Backend.Models.RequestModels;
 using EBAD_Backend.Models.ResponseModels;
 using EBAD_Backend.Exceptions;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace EBAD_Backend.Services.Concrete
 {
@@ -24,68 +29,135 @@ namespace EBAD_Backend.Services.Concrete
             _review = _dataAccess.ConnectToMongo<Review>(_settings.ReviewsCollection);
         }
 
-        public async Task<BaseResponse<bool>> InsertReview(ReviewRequest request)
+        public async Task<BaseResponse<bool>> UserVerification(string productId, string name, string email)
         {
-            var existsInDb = _review.Find(r =>
-                r.OrderId == request.OrderId &&
-                r.ReviewerName == request.ReviewerName &&
-                r.ReviewerEmailAddress == request.ReviewerEmailAddress).Any();
+            var existsInDb = await _review.Find(r =>
+                r.ProductId == productId &&
+                r.ReviewerName == name &&
+                r.ReviewerEmailAddress == email).AnyAsync();
 
             if (existsInDb)
             {
-                throw new ApiException("Review already exists")
-                {
-                    StatusCode = (int)HttpStatusCode.BadRequest
-                };
-            }
-
-            #region Fake Review Check
-
-            // check fake review here
-            //var fake = true;
-
-            //if (fake)
-            //{
-            //    return new BaseResponse<bool>()
-            //    {
-            //        Message = "Review is fake or computer gernerated",
-            //        Success = false,
-            //    };
-            //}
-
-            #endregion
-
-            var review = new Review
-            {
-                ProductId = request.ProductId,
-                OrderId = request.OrderId,
-                ProductCategory = request.ProductCategory,
-                ReviewerName = request.ReviewerName,
-                ReviewerEmailAddress = request.ReviewerEmailAddress,
-                ReviewContent = request.ReviewContent,
-            };
-
-            try
-            {
-                await _review.InsertOneAsync(review);
                 return new BaseResponse<bool>()
                 {
-                    Message = "Review added successfully",
-                    Success = true,
+                    Message = "User already reviewed this product",
+                    Success = false,
                 };
             }
-            catch(Exception e)
+
+            return new BaseResponse<bool>()
             {
-                throw new ApiException($"Failed to add review. \n{e.Message}")
+                Message = "User can review this product",
+                Success = true,
+            };
+        }
+
+        public async Task<BaseResponse<IList<Review>>> InsertReview(ReviewRequest request)
+        {
+            using (var client = new HttpClient())
+            {
+                try
                 {
-                    StatusCode = (int)HttpStatusCode.InternalServerError
-                };
+                    var apirequest = new HttpRequestMessage(HttpMethod.Post, "https://fake-review-ml.azurewebsites.net/predict");
+
+
+                    var requestBody = new
+                    {
+                        review = request.ReviewContent
+                    };
+
+                    var jsonBody = JsonConvert.SerializeObject(requestBody);
+
+                    var content = new StringContent(jsonBody, Encoding.UTF8);
+                    content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    apirequest.Content = content;
+
+                    HttpResponseMessage response = await client.SendAsync(apirequest);
+                    var isReviewd = await UserVerification(request.ProductId, request.ReviewerName, request.ReviewerEmailAddress);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string predictionResponse = await response.Content.ReadAsStringAsync();
+                        dynamic predictionObject = JsonConvert.DeserializeObject(predictionResponse)!;
+                        string prediction = (string)predictionObject.prediction;
+
+                        if (prediction == "CG")
+                        {
+                            return new BaseResponse<IList<Review>>()
+                            {
+                                Message = "Review is fake or computer gernerated",
+                                Success = false,
+                                Data = new List<Review>()
+                            };
+                        }
+
+                        else if (prediction == "OR" && isReviewd.Success == true)
+                        {
+                            var review = new Review
+                            {
+                                ProductId = request.ProductId,
+                                OrderId = request.OrderId,
+                                ProductCategory = request.ProductCategory,
+                                ReviewerName = request.ReviewerName,
+                                ReviewerEmailAddress = request.ReviewerEmailAddress,
+                                ReviewContent = request.ReviewContent,
+                            };
+
+                            await _review.InsertOneAsync(review);
+
+                            var reviewList = GetAllReviewByProductId(request.ProductId);
+
+                            return new BaseResponse<IList<Review>>()
+                            {
+                                Message = "Review added successfully",
+                                Success = true,
+                                Data = reviewList.Result.Data
+                            };
+                        }
+
+                        return new BaseResponse<IList<Review>>()
+                        {
+                            Message = "Unabled to added review due to " + ((prediction == "CG") ? 
+                                      "review is fake" : (isReviewd.Success == false) ? 
+                                      "user is already reviewd this product" : "something went wrong"),
+                            Success = false,
+                            Data = new List<Review>()
+                        };
+                    }
+
+                    return new BaseResponse<IList<Review>>()
+                    {
+                        Message = "Unabled to added review due to " + ((response.StatusCode == HttpStatusCode.BadRequest) ? 
+                                  "bad request" : (response.StatusCode == HttpStatusCode.InternalServerError) ? 
+                                  "internal server error" : "something went wrong"),
+                        Success = false,
+                        Data = new List<Review>()
+                    };
+
+                }
+                catch (Exception e)
+                {
+                    throw new ApiException($"Failed to add review. \n{e.Message}")
+                    {
+                        StatusCode = (int)HttpStatusCode.InternalServerError
+                    };
+                }
             }
         }
 
         public async Task<BaseResponse<IList<Review>>> GetAllReviewByProductId(string productId)
         {
             var reviews = await _review.FindAsync(r => r.ProductId == productId);
+
+            if (reviews == null)
+            {
+                return new BaseResponse<IList<Review>>()
+                {
+                    Message = "No reviews found",
+                    Success = false,
+                    Data = new List<Review>()
+                };
+            }
 
             return new BaseResponse<IList<Review>>()
             {

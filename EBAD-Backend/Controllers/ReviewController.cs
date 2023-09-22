@@ -28,5 +28,12 @@ namespace EBAD_Backend.Controllers
             var result = await _reviewService.GetAllReviewByProductId(productId);
             return Ok(result);
         }
+
+        [HttpGet("user-verification/{productId}/{name}/{email}")]
+        public async Task<IActionResult> UserVerification(string productId, string name, string email)
+        {
+            var result = await _reviewService.UserVerification(productId, name, email);
+            return Ok(result);
+        }
     }
 }
