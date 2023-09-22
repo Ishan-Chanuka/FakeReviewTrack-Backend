@@ -27,6 +27,9 @@ namespace EBAD_Backend.Models
         [BsonElement("phone")]
         public string ReviewContent { get; set; }
 
+        [BsonElement("image")]
+        public byte[] ProductImage { get; set; }
+
         [BsonElement("date")]
         public DateTime ReviewDate { get; set; } = DateTime.Now;
     }

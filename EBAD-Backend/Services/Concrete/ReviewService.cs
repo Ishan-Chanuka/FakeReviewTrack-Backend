@@ -100,6 +100,7 @@ namespace EBAD_Backend.Services.Concrete
                             ReviewerName = request.ReviewerName,
                             ReviewerEmailAddress = request.ReviewerEmailAddress,
                             ReviewContent = request.ReviewContent,
+                            ProductImage = request.ProductImage
                         };
 
                         await _review.InsertOneAsync(review);
