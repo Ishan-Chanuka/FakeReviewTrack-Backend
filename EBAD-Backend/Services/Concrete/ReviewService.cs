@@ -46,14 +46,14 @@ namespace EBAD_Backend.Services.Concrete
             {
                 return new BaseResponse<bool>()
                 {
-                    Message = "User already reviewed this product",
+                    Message = "You already reviewed this product",
                     Success = true,
                 };
             }
 
             return new BaseResponse<bool>()
             {
-                Message = "User can review this product",
+                Message = "You can review this product",
                 Success = false,
             };
         }
@@ -99,7 +99,7 @@ namespace EBAD_Backend.Services.Concrete
                     {
                         return new BaseResponse<IList<Review>>()
                         {
-                            Message = "Review is fake or computer gernerated",
+                            Message = "This review is likely suspicious or computer gernerated!",
                             Success = false,
                             Data = new List<Review>()
                         };
