@@ -15,21 +15,21 @@ namespace EBAD_Backend.Controllers
             _reviewService = reviewService;
         }
 
-        //[HttpPost("add-review")]
-        //public async Task<IActionResult> AddReview([FromBody] ReviewRequest review)
-        //{
-        //    var result = await _reviewService.InsertReview(review);
-        //    return Ok(result);
-        //}
+        [HttpPost("add-review")]
+        public async Task<IActionResult> AddReview([FromBody] ReviewRequest review)
+        {
+            var result = await _reviewService.InsertReview(review);
+            return Ok(result);
+        }
 
-        [HttpGet("get-all-review-by-product-id/{productId}")]
+        [HttpGet("get-all-review-by-product-id")]
         public async Task<IActionResult> GetAllReviewByProductId(string productId)
         {
             var result = await _reviewService.GetAllReviewByProductId(productId);
             return Ok(result);
         }
 
-        [HttpGet("user-verification/{productId}/{name}/{email}")]
+        [HttpGet("user-verification")]
         public async Task<IActionResult> UserVerification(string productId, string name, string email)
         {
             var result = await _reviewService.UserVerification(productId, name, email);

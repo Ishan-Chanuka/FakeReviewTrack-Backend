@@ -52,96 +52,96 @@ namespace EBAD_Backend.Services.Concrete
             };
         }
 
-        //public async Task<BaseResponse<IList<Review>>> InsertReview(ReviewRequest request)
-        //{
-        //    using var client = new HttpClient();
-        //    try
-        //    {
-        //        var apirequest = new HttpRequestMessage(HttpMethod.Post, "https://fake-review-ml.azurewebsites.net/predict");
+        public async Task<BaseResponse<IList<Review>>> InsertReview(ReviewRequest request)
+        {
+            using var client = new HttpClient();
+            try
+            {
+                var apirequest = new HttpRequestMessage(HttpMethod.Post, "https://fake-review-ml.azurewebsites.net/predict");
 
 
-        //        var requestBody = new
-        //        {
-        //            review = request.ReviewContent
-        //        };
+                var requestBody = new
+                {
+                    review = request.ReviewContent
+                };
 
-        //        var jsonBody = JsonConvert.SerializeObject(requestBody);
+                var jsonBody = JsonConvert.SerializeObject(requestBody);
 
-        //        var content = new StringContent(jsonBody, Encoding.UTF8);
-        //        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        //        apirequest.Content = content;
+                var content = new StringContent(jsonBody, Encoding.UTF8);
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                apirequest.Content = content;
 
-        //        HttpResponseMessage response = await client.SendAsync(apirequest);
-        //        var isReviewd = await UserVerification(request.ProductId, request.ReviewerName, request.ReviewerEmailAddress);
+                HttpResponseMessage response = await client.SendAsync(apirequest);
+                var isReviewd = await UserVerification(request.ProductId, request.ReviewerName, request.ReviewerEmailAddress);
 
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            string predictionResponse = await response.Content.ReadAsStringAsync();
-        //            dynamic predictionObject = JsonConvert.DeserializeObject(predictionResponse)!;
-        //            string prediction = (string)predictionObject.prediction;
+                if (response.IsSuccessStatusCode)
+                {
+                    string predictionResponse = await response.Content.ReadAsStringAsync();
+                    dynamic predictionObject = JsonConvert.DeserializeObject(predictionResponse)!;
+                    string prediction = (string)predictionObject.prediction;
 
-        //            if (prediction == "CG")
-        //            {
-        //                return new BaseResponse<IList<Review>>()
-        //                {
-        //                    Message = "Review is fake or computer gernerated",
-        //                    Success = false,
-        //                    Data = new List<Review>()
-        //                };
-        //            }
+                    if (prediction == "CG")
+                    {
+                        return new BaseResponse<IList<Review>>()
+                        {
+                            Message = "Review is fake or computer gernerated",
+                            Success = false,
+                            Data = new List<Review>()
+                        };
+                    }
 
-        //            else if (prediction == "OR" && isReviewd.Success == false)
-        //            {
-        //                var review = new Review
-        //                {
-        //                    ProductId = request.ProductId,
-        //                    OrderId = request.OrderId,
-        //                    ProductCategory = request.ProductCategory,
-        //                    ReviewerName = request.ReviewerName,
-        //                    ReviewerEmailAddress = request.ReviewerEmailAddress,
-        //                    ReviewContent = request.ReviewContent,
-        //                };
+                    else if (prediction == "OR" && isReviewd.Success == false)
+                    {
+                        var review = new Review
+                        {
+                            ProductId = request.ProductId,
+                            OrderId = request.OrderId,
+                            ProductCategory = request.ProductCategory,
+                            ReviewerName = request.ReviewerName,
+                            ReviewerEmailAddress = request.ReviewerEmailAddress,
+                            ReviewContent = request.ReviewContent,
+                        };
 
-        //                await _review.InsertOneAsync(review);
+                        await _review.InsertOneAsync(review);
 
-        //                var reviewList = GetAllReviewByProductId(request.ProductId);
+                        var reviewList = GetAllReviewByProductId(request.ProductId);
 
-        //                return new BaseResponse<IList<Review>>()
-        //                {
-        //                    Message = "Review added successfully",
-        //                    Success = true,
-        //                    Data = reviewList.Result.Data
-        //                };
-        //            }
+                        return new BaseResponse<IList<Review>>()
+                        {
+                            Message = "Review added successfully",
+                            Success = true,
+                            Data = reviewList.Result.Data
+                        };
+                    }
 
-        //            return new BaseResponse<IList<Review>>()
-        //            {
-        //                Message = "Unabled to added review due to " + ((prediction == "CG") ?
-        //                          "review is fake" : (isReviewd.Success == true) ?
-        //                          "user is already reviewd this product" : "something went wrong"),
-        //                Success = false,
-        //                Data = new List<Review>()
-        //            };
-        //        }
+                    return new BaseResponse<IList<Review>>()
+                    {
+                        Message = "Unabled to added review due to " + ((prediction == "CG") ?
+                                  "review is fake" : (isReviewd.Success == true) ?
+                                  "user is already reviewd this product" : "something went wrong"),
+                        Success = false,
+                        Data = new List<Review>()
+                    };
+                }
 
-        //        return new BaseResponse<IList<Review>>()
-        //        {
-        //            Message = "Unabled to added review due to " + ((response.StatusCode == HttpStatusCode.BadRequest) ?
-        //                      "bad request" : (response.StatusCode == HttpStatusCode.InternalServerError) ?
-        //                      "internal server error" : "something went wrong"),
-        //            Success = false,
-        //            Data = new List<Review>()
-        //        };
+                return new BaseResponse<IList<Review>>()
+                {
+                    Message = "Unabled to added review due to " + ((response.StatusCode == HttpStatusCode.BadRequest) ?
+                              "bad request" : (response.StatusCode == HttpStatusCode.InternalServerError) ?
+                              "internal server error" : "something went wrong"),
+                    Success = false,
+                    Data = new List<Review>()
+                };
 
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new ApiException($"Failed to add review. \n{e.Message}")
-        //        {
-        //            StatusCode = (int)HttpStatusCode.InternalServerError
-        //        };
-        //    }
-        //}
+            }
+            catch (Exception e)
+            {
+                throw new ApiException($"Failed to add review. \n{e.Message}")
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError
+                };
+            }
+        }
 
         public async Task<BaseResponse<IList<Review>>> GetAllReviewByProductId(string productId)
         {
