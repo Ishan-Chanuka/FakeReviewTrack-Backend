@@ -132,7 +132,7 @@ namespace EBAD_Backend.Services.Concrete
 
                     return new BaseResponse<IList<Review>>()
                     {
-                        Message = "Unabled to added review due to " + ((prediction == "CG") ?
+                        Message = "Unabled to add review due to " + ((prediction == "CG") ?
                                   "review is fake" : (isReviewd.Success == true) ?
                                   "user is already reviewd this product" : "something went wrong"),
                         Success = false,
