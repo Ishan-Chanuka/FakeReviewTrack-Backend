@@ -33,18 +33,16 @@ namespace EBAD_Backend.Services.Concrete
 
         public async Task<BaseResponse<bool>> UserVerification(string productId, string name, string email, string orderId)
         {
-            var exist = await _purchase.Find(p => 
+            var purchaseExist = await _purchase.Find(p => 
                 p.OrderId == orderId && 
-                p.ProductId == productId &&
-                p.CustomerName == name && 
                 p.CustomerEmailAddress == email).AnyAsync();
 
-            //var existsInDb = await _review.Find(r =>
-            //    r.ProductId == productId &&
-            //    r.ReviewerName == name &&
-            //    r.ReviewerEmailAddress == email).AnyAsync();
+            var reviewExist = await _review.Find(r =>
+                r.ProductId == productId &&
+                r.OrderId == orderId &&
+                r.ReviewerEmailAddress == email).AnyAsync();
 
-            if (exist)
+            if (purchaseExist && reviewExist)
             {
                 return new BaseResponse<bool>()
                 {
